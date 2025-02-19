@@ -26,7 +26,7 @@ class PubSubClient:
                 request={"name": subscription_path, "topic": self.topic_path}
             )
         except Exception as e:
-            if "AlreadyExists" not in str(e):
+            if "already exists" not in str(e):
                 raise
         return subscription_path
 

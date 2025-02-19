@@ -1,4 +1,5 @@
 from google.cloud import aiplatform
+from google.cloud.aiplatform_v1.types import IndexDatapoint
 from typing import List, Dict, Any
 import time
 
@@ -21,7 +22,7 @@ class VectorSearchManager:
 
     def create_index(self) -> str:
         """Create a new Vector Search index."""
-        index = aiplatform.MatchingEngineIndex.create(
+        index = aiplatform.MatchingEngineIndex.create_tree_ah_index(
             display_name=self.display_name,
             dimensions=self.dimensions,
             approximate_neighbors_count=50,
@@ -45,6 +46,14 @@ class VectorSearchManager:
         """Update index with new vectors."""
         index = aiplatform.MatchingEngineIndex(index_name=self.index_id)
         
+        datapoints = [
+            IndexDatapoint(
+                datapoint_id = str(v["chunk_id"]),
+                feature_vector = v["embedding"]
+            )
+            for v in vectors
+        ]
+        """
         for i in range(0, len(vectors), batch_size):
             batch = vectors[i:i + batch_size]
             
@@ -60,6 +69,9 @@ class VectorSearchManager:
             
             # Small delay to avoid rate limiting
             time.sleep(0.1)
+        """
+        import pdb;pdb.set_trace()
+        index.upsert_datapoints(datapoints=datapoints)
 
     def search_similar(self, query_embedding: List[float], num_neighbors: int = 5) -> List[Dict[str, Any]]:
         """Search for similar vectors."""
