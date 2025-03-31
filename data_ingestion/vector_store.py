@@ -1,4 +1,4 @@
- from google.cloud import aiplatform
+from google.cloud import aiplatform
 from google.cloud.aiplatform_v1.types import IndexDatapoint
 from typing import List, Dict, Any
 import time
