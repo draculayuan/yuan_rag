@@ -50,7 +50,10 @@ class VectorSearchManager:
         datapoints = [
             IndexDatapoint(
                 datapoint_id = str(v["chunk_id"]),
-                feature_vector = v["embedding"]
+                feature_vector = v["embedding"],
+                attributes = {
+                    "original_text": v["text"]
+                }
             )
             for v in vectors
         ]
