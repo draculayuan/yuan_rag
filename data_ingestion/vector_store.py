@@ -71,7 +71,6 @@ class VectorSearchManager:
             # Small delay to avoid rate limiting
             time.sleep(0.1)
         """
-        import pdb;pdb.set_trace()
         index.upsert_datapoints(datapoints=datapoints)
 
     def search_similar(self, query_embedding: List[float], num_neighbors: int = 5) -> List[Dict[str, Any]]:
