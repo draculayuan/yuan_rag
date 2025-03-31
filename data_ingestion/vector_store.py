@@ -1,4 +1,4 @@
-from google.cloud import aiplatform
+ from google.cloud import aiplatform
 from google.cloud.aiplatform_v1.types import IndexDatapoint
 from typing import List, Dict, Any
 import time
@@ -27,6 +27,7 @@ class VectorSearchManager:
             dimensions=self.dimensions,
             approximate_neighbors_count=50,
             distance_measure_type="COSINE_DISTANCE",
+            index_update_method="STREAM_UPDATE",
             description="RAG Vector Search Index",
         )
         self.index_id = index.resource_name
