@@ -64,8 +64,9 @@ class VectorSearchManager:
         
         index.upsert_datapoints(datapoints=datapoints)
 
-    def search_similar(self, query_embedding: List[float], num_neighbors: int = 5) -> List[Dict[str, Any]]:
+    def search_similar(self, query_embedding: List[float], num_neighbors: int = 5, database: str = "yuan-evernote-firestore") -> List[Dict[str, Any]]:
         """Search for similar vectors."""
+        db = firestore.Client(database = database)
         index = aiplatform.MatchingEngineIndex(index_name=self.index_id)
         response = index.find_neighbors(
             query_embeddings=[query_embedding],
@@ -74,9 +75,16 @@ class VectorSearchManager:
         
         results = []
         for match in response[0]:
+            doc_ref = db.collection("rag_chunks").document(str(match.id))
+            doc = doc_ref.get()
+            if doc.exists:
+                text = doc.to_dict()["text"]
+            else:
+                text = "[Missing chunk]"
             results.append({
                 "id": match.id,
                 "distance": match.distance,
+                "text": text
             })
         
         return results 
