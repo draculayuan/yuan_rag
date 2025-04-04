@@ -49,31 +49,12 @@ class VectorSearchManager:
         
         datapoints = [
             IndexDatapoint(
-                datapoint_id = str(v["chunk_id"]),
-                feature_vector = v["embedding"],
-                attributes = {
-                    "original_text": v["text"]
-                }
+                datapoint_id=str(v["chunk_id"]),
+                feature_vector=v["embedding"],
             )
             for v in vectors
         ]
-        """
-        for i in range(0, len(vectors), batch_size):
-            batch = vectors[i:i + batch_size]
-            
-            # Prepare data in the required format
-            embeddings = [v["embedding"] for v in batch]
-            ids = [str(v["chunk_id"]) for v in batch]
-            
-            # Update index
-            index.upsert_datapoints(
-                embeddings=embeddings,
-                ids=ids,
-            )
-            
-            # Small delay to avoid rate limiting
-            time.sleep(0.1)
-        """
+        
         index.upsert_datapoints(datapoints=datapoints)
 
     def search_similar(self, query_embedding: List[float], num_neighbors: int = 5) -> List[Dict[str, Any]]:
