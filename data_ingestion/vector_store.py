@@ -1,4 +1,4 @@
-from google.cloud import aiplatform
+from google.cloud import aiplatform, firestore
 from google.cloud.aiplatform_v1.types import IndexDatapoint
 from typing import List, Dict, Any
 import time
@@ -43,9 +43,10 @@ class VectorSearchManager:
                 pass
         return self.create_index()
 
-    def update_index(self, vectors: List[Dict[str, Any]], batch_size: int = 100):
+    def update_index(self, vectors: List[Dict[str, Any]], database: str = "yuan-evernote-firestore"):
         """Update index with new vectors."""
         index = aiplatform.MatchingEngineIndex(index_name=self.index_id)
+        db = firestore.Client(database = database)
         
         datapoints = [
             IndexDatapoint(
@@ -54,6 +55,12 @@ class VectorSearchManager:
             )
             for v in vectors
         ]
+
+        # save to firestore for retrieval later
+        for v in vectors:
+            doc_id = str(v["chunk_id"])
+            doc_ref = db.collection("rag_chunks").document(doc_id)
+            doc_ref.set({"text": v["text"]})
         
         index.upsert_datapoints(datapoints=datapoints)
 
