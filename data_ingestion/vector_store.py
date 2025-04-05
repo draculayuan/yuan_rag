@@ -9,12 +9,16 @@ class VectorSearchManager:
         project_id: str,
         location: str,
         index_id: str = None,
+        index_endpoint_id: str = None,
+        deployed_index_id: str = None,
         dimensions: int = 768,
         display_name: str = "rag-vector-index",
     ):
         self.project_id = project_id
         self.location = location
         self.index_id = index_id
+        self.index_endpoint_id = index_endpoint_id
+        self.deployed_index_id = deployed_index_id
         self.dimensions = dimensions
         self.display_name = display_name
         
@@ -44,7 +48,6 @@ class VectorSearchManager:
         return self.create_index()
 
     def update_index(self, vectors: List[Dict[str, Any]], database: str = "yuan-evernote-firestore"):
-        """Update index with new vectors."""
         index = aiplatform.MatchingEngineIndex(index_name=self.index_id)
         db = firestore.Client(database = database)
         
@@ -67,9 +70,13 @@ class VectorSearchManager:
     def search_similar(self, query_embedding: List[float], num_neighbors: int = 5, database: str = "yuan-evernote-firestore") -> List[Dict[str, Any]]:
         """Search for similar vectors."""
         db = firestore.Client(database = database)
-        index = aiplatform.MatchingEngineIndex(index_name=self.index_id)
-        response = index.find_neighbors(
-            query_embeddings=[query_embedding],
+        #index = aiplatform.MatchingEngineIndex(index_name=self.index_id)
+        index_endpoint = aiplatform.MatchingEngineIndexEndpoint(
+            index_endpoint_name=self.index_endpoint_id
+        )
+        response = index_endpoint.find_neighbors(
+            deployed_index_id=self.deployed_index_id,
+            queries=query_embedding,
             num_neighbors=num_neighbors,
         )
         
